@@ -1,10 +1,10 @@
 # firewall-policy-api
-防火墙策略接口，通过Grafana Alerting/API 添加防火墙规则，实现自定义的拦截外网扫描功能。只实现了H3C
+防火墙策略接口，通过Grafana Alerting/API 添加防火墙规则，实现自定义的拦截外网扫描功能。只测试并实现了H3C
 
 ## Grafana中配置
   - 在grafana中添加`Alerting`-> `Contact points`
   - 选择webhook
-  - URL填入`http://your_docker_ip:80/ban`
+  - URL填入`http://your_docker_ip:80/banByGrafana`
   - Message填入
     ```
     {{- if gt (len .Alerts.Firing) 0 -}}
@@ -35,9 +35,10 @@
     -e SSH_USER=admin \
     -e SSH_PASSWORD=your_password \
     -e SSH_IP_PORT=192.168.0.1:22 \
+    -e IP_WHITE_LIST=1.1.1.1,2.2.2.0/24 \
     jeessy/firewall-policy-api
   ```
 
 ## 系统中使用
 - 下载并解压[https://github.com/jeessy2/firewall-policy-api/releases](https://github.com/jeessy2/firewall-policy-api/releases)
-- 通过接口 `curl http://your_docker_ip:80/ban?ip=1.1.1.1` 配置
+- 通过接口 `curl http://your_docker_ip:80/banByIP?ip=1.1.1.1` 配置
