@@ -21,6 +21,12 @@ func BanByGrafana(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if ga.Status == "resolved" && len(ga.Alerts) > 0 {
+		log.Printf("%s 已恢复\n", ga.Alerts[0].Labels.Instance)
+		returnOK(w, "已恢复", nil)
+		return
+	}
+
 	ips := make([]string, 0)
 	for i := 0; i < len(ga.Alerts); i++ {
 		alert := ga.Alerts[i]
