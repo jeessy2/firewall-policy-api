@@ -37,7 +37,8 @@ func execH3CCmd(cmds ...string) error {
 	if condition := user == "" || password == "" || ipPort == ""; condition {
 		return fmt.Errorf("请设置SSH_USER, SSH_PASSWORD, SSH_IP_PORT环境变量")
 	}
-
+	// 关闭日志
+	ssh.IsLogDebug = false
 	result, err := ssh.RunCommandsWithBrand(user, password, ipPort, ssh.H3C, cmds...)
 	log.Println("执行结果:", result)
 
