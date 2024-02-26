@@ -5,6 +5,7 @@
   - 在grafana中添加`Alerting`-> `Contact points`
   - 选择webhook
   - URL填入`http://your_docker_ip:80/banByGrafana`
+  - 支持临时封禁`http://your_docker_ip:80/banByGrafana?temporaryBan=true`
   - Message填入
     ```
     {{- if gt (len .Alerts.Firing) 0 -}}

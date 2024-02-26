@@ -20,7 +20,7 @@ func BanByIP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = banIP(ips)
+	err = banIP(ips, true)
 	if err != nil {
 		returnError(w, err)
 		return

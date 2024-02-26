@@ -21,38 +21,49 @@ func BanByGrafana(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if ga.Status == "resolved" && len(ga.Alerts) > 0 {
-		log.Printf("%s 已恢复\n", ga.Alerts[0].Labels.Instance)
-		returnOK(w, "已恢复", nil)
-		return
-	}
+	// 临时封禁
+	temporaryBan := r.URL.Query().Get("temporaryBan") == "true"
 
-	ips := make([]string, 0)
+	// 解析IP
+	ipBan := make([]string, 0)
+	ipUnBan := make([]string, 0)
 	for i := 0; i < len(ga.Alerts); i++ {
 		alert := ga.Alerts[i]
+		sp := strings.Split(alert.Annotations.Description, "\n")
+		ips, err := checkIP(sp)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
 		if alert.Status == "firing" {
-			sp := strings.Split(alert.Annotations.Description, "\n")
-			banIPs, err := checkIP(sp)
-			if err != nil {
-				log.Println(err)
-			}
-			ips = append(ips, banIPs...)
+			ipBan = append(ipBan, ips...)
+		} else if(temporaryBan) {
+			// 如果是临时封禁&&不是firing状态, 则解封
+			ipUnBan = append(ipUnBan, ips...)
 		}
 	}
 
-	// ban IP
-	if len(ips) == 0 {
-		returnError(w, fmt.Errorf("Ban的IP为空, Request: %s", ga))
+	// 判断是否为空
+	if len(ipBan) == 0 && len(ipUnBan) == 0 {
+		returnError(w, fmt.Errorf("IP为空, Request: %s", ga))
 		return
 	}
-	log.Printf("将要Ban的IP有: %s\n", ips)
-	err = banIP(ips)
+
+	if len(ipBan) > 0 {
+		log.Printf("IP %s 将被封禁\n", ipBan)
+		err = banIP(ipBan, true)
+	}
+
+	if len(ipUnBan) > 0 {
+		log.Printf("IP %s 将被解封\n", ipUnBan)
+		err = banIP(ipBan, false)
+	}
 
 	if err != nil {
-		returnError(w, fmt.Errorf("禁止IP失败: %s", err))
+		returnError(w, fmt.Errorf("操作失败: %s", err))
 		return
 	}
 
 	// success
-	returnOK(w, "成功BanIP", ips)
+	returnOK(w, "成功", map[string][]string{"ipBan": ipBan, "ipUnBan": ipUnBan})
 }

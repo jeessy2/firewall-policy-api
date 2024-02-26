@@ -9,7 +9,7 @@ import (
 )
 
 // banIP
-func banIP(ips []string) error {
+func banIP(ips []string, ban bool) error {
 
 	if len(ips) == 0 {
 		return fmt.Errorf("IP不能为空")
@@ -20,7 +20,11 @@ func banIP(ips []string) error {
 	cmds = append(cmds, "security-policy ip")
 	cmds = append(cmds, "rule name deny-auto")
 	for i := 0; i < len(ips); i++ {
-		cmds = append(cmds, "source-ip-host "+ips[i])
+		if ban {
+			cmds = append(cmds, "source-ip-host "+ips[i])
+		} else {
+			cmds = append(cmds, "undo source-ip-host "+ips[i])
+		}
 	}
 	cmds = append(cmds, "quit")
 	cmds = append(cmds, "quit")
