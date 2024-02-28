@@ -14,7 +14,7 @@ func returnError(w http.ResponseWriter, err error) {
 	result := &entity.Result{}
 
 	w.WriteHeader(http.StatusOK)
-	result.Code = http.StatusOK
+	result.Code = http.StatusInternalServerError
 	result.Msg = fmt.Sprintf("Ban IP失败: %s", err)
 
 	jsonData, _ := json.Marshal(result)
