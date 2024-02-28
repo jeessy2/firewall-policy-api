@@ -13,8 +13,8 @@ import (
 func returnError(w http.ResponseWriter, err error) {
 	result := &entity.Result{}
 
-	w.WriteHeader(http.StatusInternalServerError)
-	result.Code = http.StatusInternalServerError
+	w.WriteHeader(http.StatusOK)
+	result.Code = http.StatusOK
 	result.Msg = fmt.Sprintf("Ban IP失败: %s", err)
 
 	jsonData, _ := json.Marshal(result)
