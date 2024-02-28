@@ -6,23 +6,17 @@
   - 选择webhook
   - URL填入`http://your_docker_ip:80/banByGrafana`
   - 支持临时封禁`http://your_docker_ip:80/banByGrafana?temporaryBan=true`
-  - Message填入
-    ```
-    {{- if gt (len .Alerts.Firing) 0 -}}
-    {{- range $index, $alert := .Alerts.Firing -}}
-    {{ index $alert.Annotations "description" }}
-    {{- end }}
-    {{- end }}
-    ```
+  - HTTP Method `POST`
   - 创建一个`Alert rules`, 在`Description`中填入
     ```
-    {{ range $k, $v := $values }}
-    {{ $v.Labels.ClientHost }}
-    {{ end }}
-    ```
-  - 创建一个`Notification policies`, 将`Alert rules`与`Contact points`关联
+    {{- range $k, $v := $values -}}
+    IP: {{ $v.Labels.clientHost }}
 
-## 其它配置
+    {{ end -}}
+    ```
+  - 创建一个`Notification policies`, 将`Alert rules`与`Contact points`通过标签关联
+
+## 其它设置
   - SSH_USER `用户`
   - SSH_PASSWORD `密码`
   - SSH_IP_PORT `防火墙ip:port`
