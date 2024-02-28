@@ -16,7 +16,9 @@ func returnError(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	result.Code = http.StatusInternalServerError
 	result.Msg = fmt.Sprintf("Ban IP失败: %s", err)
-	log.Println(result)
+
+	jsonData, _ := json.Marshal(result)
+	log.Println(string(jsonData))
 
 	json.NewEncoder(w).Encode(result)
 }
@@ -29,7 +31,9 @@ func returnOK(w http.ResponseWriter, msg string, data interface{}) {
 	result.Code = http.StatusOK
 	result.Msg = msg
 	result.Data = data
-	log.Println(result)
+
+	jsonData, _ := json.Marshal(result)
+	log.Println(string(jsonData))
 
 	json.NewEncoder(w).Encode(result)
 }

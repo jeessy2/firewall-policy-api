@@ -32,12 +32,12 @@ func BanByGrafana(w http.ResponseWriter, r *http.Request) {
 		sp := strings.Split(alert.Annotations.Description, "\n")
 		ips, err := checkIP(sp)
 		if err != nil {
+			// 只打印
 			log.Println(err)
-			continue
 		}
 		if alert.Status == "firing" {
 			ipBan = append(ipBan, ips...)
-		} else if(temporaryBan) {
+		} else if temporaryBan {
 			// 如果是临时封禁&&不是firing状态, 则解封
 			ipUnBan = append(ipUnBan, ips...)
 		}

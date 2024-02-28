@@ -26,39 +26,39 @@ func checkIP(ips []string) (toBeBanIPs []string, err error) {
 		}
 
 		if condition := ips[i] == ""; condition {
-			err = fmt.Errorf(errStr + "IP地址不能为空!")
-			log.Println(err)
 			continue
 		}
 		// 使用正则查找IPv4/IPv6
-		result := ipv4Reg.FindString(ips[i])
-		if result == "" {
-			result = ipv6Reg.FindString(ips[i])
+		results := ipv4Reg.FindAllString(ips[i], -1)
+		if len(results) == 0 {
+			results = ipv6Reg.FindAllString(ips[i], -1)
 		}
-		ip := net.ParseIP(result)
-		if ip == nil {
-			err = fmt.Errorf(errStr+"IP地址: %s 非法, 将不会被Ban! ", ips[i])
-			continue
-		}
-		if ip.IsPrivate() {
-			err = fmt.Errorf(errStr+"IP地址: %s 不能为私网地址, 将不会被Ban! ", ip.String())
-			continue
-		}
-		if ip.IsLoopback() {
-			err = fmt.Errorf(errStr+"IP地址: %s 不能为Loopback, 将不会被Ban! ", ip.String())
-			continue
-		}
-		// 如果在白名单中, 将不会被Ban
-		var find = false
-		for j := 0; j < len(whiteList); j++ {
-			if whiteList[j].Contains(ip) {
-				find = true
-				err = fmt.Errorf(errStr+"IP地址: %s 在白名单中, 将不会被Ban! ", ip.String())
-				break
+		for _, result := range results {
+			ip := net.ParseIP(result)
+			if ip == nil {
+				err = fmt.Errorf(errStr+"IP地址: %s 非法, 将不会被Ban! ", ips[i])
+				continue
 			}
-		}
-		if !find {
-			toBeBanIPs = append(toBeBanIPs, ip.String())
+			if ip.IsPrivate() {
+				err = fmt.Errorf(errStr+"IP地址: %s 不能为私网地址, 将不会被Ban! ", ip.String())
+				continue
+			}
+			if ip.IsLoopback() {
+				err = fmt.Errorf(errStr+"IP地址: %s 不能为Loopback, 将不会被Ban! ", ip.String())
+				continue
+			}
+			// 如果在白名单中, 将不会被Ban
+			var find = false
+			for j := 0; j < len(whiteList); j++ {
+				if whiteList[j].Contains(ip) {
+					find = true
+					err = fmt.Errorf(errStr+"IP地址: %s 在白名单中, 将不会被Ban! ", ip.String())
+					break
+				}
+			}
+			if !find {
+				toBeBanIPs = append(toBeBanIPs, ip.String())
+			}
 		}
 	}
 	return
