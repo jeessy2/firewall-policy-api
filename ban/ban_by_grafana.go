@@ -56,7 +56,7 @@ func BanByGrafana(w http.ResponseWriter, r *http.Request) {
 
 	if len(ipUnBan) > 0 {
 		log.Printf("IP %s 将被解封\n", ipUnBan)
-		err = banIP(ipBan, false)
+		err = banIP(ipUnBan, false)
 	}
 
 	if err != nil {
